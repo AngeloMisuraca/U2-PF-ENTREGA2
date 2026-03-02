@@ -18,8 +18,8 @@ const tackles = {
 }
 
 const ataquesCharmander = {
-    flames: {
-        name: 'flames',
-        damage: 12
+    cuchillada: {
+        name: 'cuchillada',
+        damage: 20
     },
 };

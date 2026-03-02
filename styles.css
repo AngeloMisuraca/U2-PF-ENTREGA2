@@ -29,7 +29,7 @@ body {
     background-color: white;
     padding: 12px;
     display: none;
-
+    cursor: pointer;
 }
 
 .footer {
@@ -39,7 +39,7 @@ body {
     bottom: 0px;
     left: 0;
     right: 0;
-    display: grid;
+    display: none;
     grid-template-columns: 1fr 1fr;
     gap: 10px;
     padding: 15px;
@@ -164,4 +164,8 @@ body {
     font-size: 10px;
     text-align: right;
     margin-top: 6px;
+}
+
+.hidden {
+    display: none !important;
 }

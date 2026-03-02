@@ -128,6 +128,8 @@ function colisionRectangular({ rectangulo1, rectangulo2 }) {
 const battleActivo = {
     initiated: false
 }
+let battleCooldown = false;
+
 
 function animate() {
     const animationID = window.requestAnimationFrame(animate);
@@ -146,23 +148,32 @@ function animate() {
 
     if (battleActivo.initiated) return
 
-    // Activacion de batalla
     if (keys.ArrowUp.presionada || keys.ArrowDown.presionada || keys.ArrowLeft.presionada || keys.ArrowRight.presionada) {
         for (let i = 0; i < battleZones.length; i++) {
             const battlezone = battleZones[i];
-            // const overlappingArea = Math.min(jugador.posicion.x + jugador.width, battlezone.posicion.x + battlezone.width) - Math.max(jugador.posicion.x, battlezone.posicion.x) * Math.min(jugador.posicion.y + jugador.height, battlezone.posicion.y + battlezone.height) - Math.max(jugador.posicion.y, battlezone.posicion.y)
 
-            if (
+            if (!battleCooldown &&
                 colisionRectangular({
                     rectangulo1: jugador,
                     rectangulo2: battlezone
-                }) && Math.random() < 0.003
-                //&& overlappingArea > (jugador.width * jugador.height)
-
+                })
             ) {
+
                 window.cancelAnimationFrame(animationID)
 
                 battleActivo.initiated = true
+
+                pikachu.health = 100;
+                charmander.health = 100;
+                document.querySelector('#HP_jugador .hp-fill').style.width = '100%';
+                document.querySelector('#HP_rival .hp-fill').style.width = '100%';
+
+                gsap.set(pikachu, { opacity: 1 });
+                gsap.set(charmander, { opacity: 1 });
+                gsap.set(pikachu.posicion, { x: 380, y: 490 });
+                gsap.set(charmander.posicion, { x: 788, y: 140 });
+
+
                 gsap.to('#overlappingDiv', {
                     opacity: 1,
                     repeat: 3,
@@ -171,13 +182,17 @@ function animate() {
                     onComplete() {
                         gsap.to('#overlappingDiv', {
                             opacity: 1,
-                            duration: 0.5,
+                            duration: 0.1,
                             onComplete() {
+                                document.querySelector('.battle-ui').style.display = 'block';
+                                document.querySelector('.footer').style.display = 'grid';
+                                document.querySelector('#dialogoBox').style.display = 'none';
+
                                 animateBattle()
+
                                 gsap.to('#overlappingDiv', {
                                     opacity: 0,
-                                    duration: 0.5,
-
+                                    duration: 0.2
                                 })
                             }
                         })
@@ -191,109 +206,46 @@ function animate() {
     if (keys.ArrowUp.presionada && ultimaKey === "ArrowUp") {
         jugador.animate = true
         jugador.image = jugador.sprites.arriba
-
         for (let i = 0; i < limites.length; i++) {
             const limite = limites[i];
-            if (
-                colisionRectangular({
-                    rectangulo1: jugador,
-                    rectangulo2: {
-                        ...limite,
-                        posicion: {
-                            x: limite.posicion.x,
-                            y: limite.posicion.y + 3
-                        }
-                    }
-                })
-            ) {
-                moving = false;
-                break;
+            if (colisionRectangular({ rectangulo1: jugador, rectangulo2: { ...limite, posicion: { x: limite.posicion.x, y: limite.posicion.y + 3 } } })) {
+                moving = false; break;
             }
         }
-        if (moving) {
-            simboloMovible.forEach(Movibles => {
-                Movibles.posicion.y += 3
-            })
-        }
-
+        if (moving) simboloMovible.forEach(Movibles => { Movibles.posicion.y += 3 })
     }
     else if (keys.ArrowDown.presionada && ultimaKey == "ArrowDown") {
         jugador.animate = true
         jugador.image = jugador.sprites.abajo
         for (let i = 0; i < limites.length; i++) {
             const limite = limites[i];
-            if (
-                colisionRectangular({
-                    rectangulo1: jugador,
-                    rectangulo2: {
-                        ...limite,
-                        posicion: {
-                            x: limite.posicion.x,
-                            y: limite.posicion.y - 3
-                        }
-                    }
-                })
-            ) {
-                moving = false;
-                break;
+            if (colisionRectangular({ rectangulo1: jugador, rectangulo2: { ...limite, posicion: { x: limite.posicion.x, y: limite.posicion.y - 3 } } })) {
+                moving = false; break;
             }
         }
-        if (moving)
-            simboloMovible.forEach(Movibles => {
-                Movibles.posicion.y -= 3
-            })
+        if (moving) simboloMovible.forEach(Movibles => { Movibles.posicion.y -= 3 })
     }
     else if (keys.ArrowLeft.presionada && ultimaKey == "ArrowLeft") {
         jugador.animate = true
         jugador.image = jugador.sprites.izquierda
         for (let i = 0; i < limites.length; i++) {
             const limite = limites[i];
-            if (
-                colisionRectangular({
-                    rectangulo1: jugador,
-                    rectangulo2: {
-                        ...limite,
-                        posicion: {
-                            x: limite.posicion.x + 3,
-                            y: limite.posicion.y
-                        }
-                    }
-                })
-            ) {
-                moving = false;
-                break;
+            if (colisionRectangular({ rectangulo1: jugador, rectangulo2: { ...limite, posicion: { x: limite.posicion.x + 3, y: limite.posicion.y } } })) {
+                moving = false; break;
             }
         }
-        if (moving)
-            simboloMovible.forEach(Movibles => {
-                Movibles.posicion.x += 3
-            })
+        if (moving) simboloMovible.forEach(Movibles => { Movibles.posicion.x += 3 })
     }
     else if (keys.ArrowRight.presionada && ultimaKey == "ArrowRight") {
         jugador.animate = true
         jugador.image = jugador.sprites.derecha
         for (let i = 0; i < limites.length; i++) {
             const limite = limites[i];
-            if (
-                colisionRectangular({
-                    rectangulo1: jugador,
-                    rectangulo2: {
-                        ...limite,
-                        posicion: {
-                            x: limite.posicion.x - 3,
-                            y: limite.posicion.y
-                        }
-                    }
-                })
-            ) {
-                moving = false;
-                break;
+            if (colisionRectangular({ rectangulo1: jugador, rectangulo2: { ...limite, posicion: { x: limite.posicion.x - 3, y: limite.posicion.y } } })) {
+                moving = false; break;
             }
         }
-        if (moving)
-            simboloMovible.forEach(Movibles => {
-                Movibles.posicion.x -= 3
-            })
+        if (moving) simboloMovible.forEach(Movibles => { Movibles.posicion.x -= 3 })
     }
 }
 
@@ -325,6 +277,7 @@ const charmander = new Sprite({
     },
     animate: true,
     isEnemy: true,
+    name: 'Charmander',
     scale: 2.5
 
 });
@@ -343,6 +296,7 @@ const pikachu = new Sprite({
         max: 4,
     },
     animate: true,
+    name: 'Pikachu',
     scale: -0.5
 
 });
@@ -359,13 +313,15 @@ function animateBattle() {
         Sprite.draw();
     })
 }
-// animateBattle()
 
 document.querySelectorAll('button').forEach((button) => {
     button.addEventListener('click', (e) => {
+
+        if (!battleActivo.initiated) return;
+
         const attackKey = e.currentTarget.innerHTML.trim();
         const selectedattack = tackles[attackKey];
-        console.log(selectedattack)
+
         if (selectedattack) {
             pikachu.attack({
                 attack: selectedattack,
@@ -374,8 +330,35 @@ document.querySelectorAll('button').forEach((button) => {
 
             });
         }
+
+        if (charmander.health <= 0) {
+            charmander.faint();
+        }
+
+        if (pikachu.health <= 0) {
+            pikachu.faint();
+        }
     });
 });
+
+document.querySelector('#dialogoBox').addEventListener('click', (event) => {
+    event.currentTarget.style.display = 'none';
+})
+
+function finalizarCombate() {
+    document.querySelector('.battle-ui').style.display = 'none';
+    document.querySelector('.footer').style.display = 'none';
+    document.querySelector('#dialogoBox').style.display = 'none';
+
+    battleActivo.initiated = false;
+    battleCooldown = true;
+
+    setTimeout(() => {
+        battleCooldown = false;
+    }, 2000);
+
+    animate();
+}
 
 window.addEventListener('keydown', (e) => {
     switch (e.key) {
@@ -414,3 +397,7 @@ window.addEventListener('keyup', (e) => {
             break;
     }
 })
+
+document.querySelector('.battle-ui').style.display = 'none';
+document.querySelector('.footer').style.display = 'none';
+document.querySelector('#dialogoBox').style.display = 'none';
