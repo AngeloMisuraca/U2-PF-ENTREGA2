@@ -269,7 +269,7 @@ function animate() {
 animate();
 
 const battleBackgoundImage = new Image();
-battleBackgoundImage.src = './img/BattleBackground.png';
+battleBackgoundImage.src = './img/battleBackground.png';
 const battleBackground = new Sprite({
     posicion: {
         x: 0,
