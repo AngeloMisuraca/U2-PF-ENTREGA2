@@ -18,6 +18,7 @@ const keys = {
 
 let ultimaKey = "";
 
+
 window.addEventListener('keydown', (e) => {
     switch (e.key) {
         case 'ArrowUp':

@@ -17,6 +17,7 @@ function animate() {
     let moving = true;
     jugador.animate = false;
 
+    // Si ya hay batalla iniciada, se detiene la animación del mapa
     if (battleActivo.initiated) return
 
     if (keys.ArrowUp.presionada || keys.ArrowDown.presionada || keys.ArrowLeft.presionada || keys.ArrowRight.presionada) {
@@ -28,8 +29,10 @@ function animate() {
                 rectangulo2: battlezone
             }) && Math.random() < 0.001
             ) {
+                // Detiene la animación del mapa
                 window.cancelAnimationFrame(animationID)
 
+                // Cambiamos la musica de ciudad a la musica de batalla
                 musicaCiudad.pause();
                 musicaBatalla.currentTime = 10;
                 musicaBatalla.play();
@@ -46,14 +49,15 @@ function animate() {
                 gsap.set(pikachu.posicion, { x: 380, y: 490 });
                 gsap.set(charmander.posicion, { x: 788, y: 140 });
 
+                // Animación de transición a batalla
                 gsap.to('#overlappingDiv', {
                     opacity: 1,
                     repeat: 3,
-                    yoyo: true,
+                    yoyo: true, // sube y baja la opacidad 
                     duration: 0.5,
                     onComplete() {
                         gsap.to('#overlappingDiv', {
-                            opacity: 1,
+                            opacity: 1, 
                             duration: 0.5,
                             onComplete() {
                                 document.querySelector('.battle-ui').style.display = 'block';
@@ -62,6 +66,7 @@ function animate() {
 
                                 animateBattle();
 
+                                //apaga todo despues de la pelea
                                 gsap.to('#overlappingDiv', {
                                     opacity: 0,
                                     duration: 0.5
@@ -88,14 +93,21 @@ function animate() {
     }
 
     if (keys.ArrowUp.presionada && ultimaKey === "ArrowUp") {
+        //inicia la animacion del personaje
         jugador.animate = true
         jugador.image = jugador.sprites.arriba
+
+        //Recorre todos los límites del mapa
+        //para verificar si el jugador chocará al moverse
         for (let i = 0; i < limites.length; i++) {
             const limite = limites[i];
+            // spread operator ...
             if (colisionRectangular({ rectangulo1: jugador, rectangulo2: { ...limite, posicion: { x: limite.posicion.x, y: limite.posicion.y + 3 } } })) {
+                // Si hay colisión, no permite que el jugador se mueva
                 moving = false; break;
             }
         }
+        // hace que la pantalla siga para abajo
         if (moving) simboloMovible.forEach(Movibles => { Movibles.posicion.y += velocidad })
     }
     else if (keys.ArrowDown.presionada && ultimaKey == "ArrowDown") {
@@ -103,6 +115,7 @@ function animate() {
         jugador.image = jugador.sprites.abajo
         for (let i = 0; i < limites.length; i++) {
             const limite = limites[i];
+
             if (colisionRectangular({ rectangulo1: jugador, rectangulo2: { ...limite, posicion: { x: limite.posicion.x, y: limite.posicion.y - 3 } } })) {
                 moving = false; break;
             }
